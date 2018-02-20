@@ -46,6 +46,7 @@ to see what sessions are available.
 import geni.portal as portal
 import geni.rspec.pg as rspec
 import geni.rspec.emulab as elab
+import geni.rspec.igext
 import geni.urn as URN
 
 #
@@ -125,6 +126,7 @@ if params.FIXED_ENB:
     enb1.component_id = params.FIXED_ENB
 enb1.hardware_type = GLOBALS.NUC_HWTYPE
 enb1.disk_image = GLOBALS.OAI_ENB_IMG
+enb1.Desire('rf-radiated', 1)
 connectOAI_DS(enb1)
 enb1.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r ENB"))
 enb1_rue1_rf = enb1.addInterface("rue1_rf")
@@ -135,6 +137,7 @@ if params.FIXED_UE:
     rue1.component_id = params.FIXED_UE
 rue1.hardware_type = GLOBALS.UE_HWTYPE
 rue1.disk_image = GLOBALS.UE_IMG
+rue1.Desire('rf-radiated', 1)
 rue1.adb_target = "adb-tgt"
 rue1_enb1_rf = rue1.addInterface("enb1_rf")
 
