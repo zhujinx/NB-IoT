@@ -62,7 +62,7 @@ class GLOBALS(object):
     ADB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU14-64-PNTOOLS")
     OAI_EPC_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU16-64-OAIEPC")
     OAI_ENB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU16-64-OAIENB")
-    OAI_CONF_SCRIPT = "/usr/bin/sudo /opt/oai/phantomnet/bin/config_oai.pl"
+    OAI_CONF_SCRIPT = "/usr/bin/sudo /local/repository/bin/config_oai.pl"
     NUC_HWTYPE = "nuc5300"
     UE_HWTYPE = "nexus5"
 
