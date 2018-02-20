@@ -610,7 +610,7 @@ sub remoteENB() {
     my $done = 0;
     while ($tries < 6 && ! $done)
     {
-	system("sudo ssh -o StrictHostKeyChecking=no enb 'sudo $OAI_BINDIR/enb.start.sh'");
+	system("sudo ssh -o StrictHostKeyChecking=no enb1 'sudo $OAI_BINDIR/enb.start.sh'");
 	if (($? >> 8) != 0)
 	{
 	    warn "Could not remotely start eNodeB, try $tries";
