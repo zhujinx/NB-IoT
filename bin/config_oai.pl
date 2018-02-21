@@ -20,6 +20,9 @@ BEGIN {
 use epclib;
 
 # Function prototypes
+sub logdie($);
+sub logwarn($);
+sub logprint($);
 sub gatherInfo();
 sub DBImport($$$$);
 sub connectDB($$$);
@@ -131,9 +134,9 @@ my @MME_HOSTLIST = ('mme-s1-lan', 'epc-s1-lan');
 # Display help and exit.
 #
 sub help() {
-    print "Usage: config_oai [-n] [-d] -r <role>\n";
-    print "  -r : OAI role.  One of: ". join(", ", keys %OAI_ROLES) ."\n";
-    print "  -d : Enable debugging messages.\n";
+    logprint("Usage: config_oai [-n] [-d] -r <role>\n");
+    logprint("  -r : OAI role.  One of: ". join(", ", keys %OAI_ROLES) ."\n");
+    logprint("  -d : Enable debugging messages.\n");
 
     exit 1;
 }
@@ -143,6 +146,14 @@ sub help() {
 #
 ($UID == 0)
     or die "You must run this script as root (e.g., via sudo)!\n";
+
+#
+# Setup logfile
+#
+open LOGFILE, ">>", "$OAI_LOGDIR/startup.log";
+logprint("----------------------\n");
+logprint("Setting up OAI servers\n");
+logprint("----------------------\n");
 
 #
 # Parse command line arguments.
@@ -188,7 +199,7 @@ TOPSW: for ($role) {
 
 
     # Default
-    die "Unknown role: $role\n";
+    logdie("Unknown role: $role\n");
 }
 runOAI();
 
@@ -208,6 +219,34 @@ sub lookupIP(@) {
     }
 
     return $ipaddr;
+}
+
+#
+# Print message to log file and stderr, then exit with an error code of 1
+#
+sub logdie($) {
+    my ($message) = @_;
+    print LOGFILE "ERROR: " . $message;
+    print STDERR "ERROR: " . $message;
+    exit(1);
+}
+
+#
+# Print message to log file and stderr and flag it as a warning
+#
+sub logwarn($) {
+    my ($message) = @_;
+    print LOGFILE "WARNING: " . $message;
+    print STDERR "WARNING: " . $message;
+}
+
+#
+# Print a message to log file and stdout
+#
+sub logprint($) {
+    my ($message) = @_;
+    print LOGFILE $message;
+    print $message;
 }
 
 #
@@ -273,7 +312,7 @@ sub gatherInfo() {
 	};
 
 	# Default
-	die "Unknown role: $role\n";
+	logdie("Unknown role: $role\n");
     }
 }
 
@@ -286,20 +325,20 @@ sub DBImport($$$$) {
     # Already done?
     return if (-e $OAI_DB_INIT_FF);
 
-    die "SQL file does not exist: $sqlpath"
+    logdie("SQL file does not exist: $sqlpath")
 	unless (-f $sqlpath);
 
     my $res = system("$MYSQL_CLI --user=$user --password=$pass $dbname < $sqlpath");
     if ($res) {
 	$res = $res >> 8;
-	die "Error running mysql client: $res";
+	logdie("Error running mysql client: $res");
     }
 
-    print "OAI DB initialized.\n";
+    logprint("OAI DB initialized.\n");
 
     # Mark one-time action as complete.
     system("$TOUCH $OAI_DB_INIT_FF") == 0 or
-	die "Could not touch DB init flag file!";
+	logdie("Could not touch DB init flag file!");
 }
 
 #
@@ -319,9 +358,9 @@ sub connectDB($$$) {
 #
 sub blockCnetVMARP() {
     # system("$ARPTABLES -F") == 0
-    #	 or die "Could not flush arptables!\n";
+    #	 or logdie("Could not flush arptables!\n");
     system("$ARPTABLES -I INPUT -i $ctrlif -d $EMULAB_VMRANGE -j DROP") == 0
-	or die "Failed to install VM control network ARP block rule!\n";
+	or logdie("Failed to install VM control network ARP block rule!\n");
 }
 
 #
@@ -333,7 +372,7 @@ sub setHostName() {
     chomp $nick;
     my ($sname,) = split(/\./, $nick);
     system("$HOSTNAME $sname") == 0
-	or die "Could not set hostname to: $sname\n";
+	or logdie("Could not set hostname to: $sname\n");
     return $sname;
 }
 
@@ -345,7 +384,7 @@ sub loadManifest() {
 
     my $manistr = `$GENIGET manifest`;
     chomp $manistr;
-    die "Error fetching experiment manifest, or no manifest available!\n"
+    logdie("Error fetching experiment manifest, or no manifest available!\n")
 	if ($? || !$manistr);
 
     eval { $dom = XML::LibXML->load_xml(string => $manistr,
@@ -353,7 +392,7 @@ sub loadManifest() {
 					no_network => 1,
 					line_numbers => 1) };
 
-    die "Invalid XML in manifest: $@\n"
+    logdie("Invalid XML in manifest: $@\n")
 	if ($@);
 
     return $dom;
@@ -395,7 +434,7 @@ sub provisionRealUEs($$$$) {
 	my $seqno = $node->getAttribute("sim_sequence_number");
 	next unless ($vname && $imsi && $seqno);
 	
-	print "Provisioning UE '$vname': $imsi, $seqno\n";
+	logprint("Provisioning UE '$vname': $imsi, $seqno\n");
  
 	# Pad the sequence number out to 20 digits with leading zeros. Why?
 	# Good question for the OAI folks...
@@ -476,7 +515,7 @@ sub provisionSimUEs($$$$) {
 	    "  '$oai_imsi', '9', '15', 'DISABLED',".
 	    "  'ENABLED', 'LIPA-ONLY')");
 
-    print "Provisioned OAISIM UE : $oai_imsi\n";
+    logprint("Provisioned OAISIM UE : $oai_imsi\n");
 
     return $pdn_id;
 }
@@ -509,7 +548,7 @@ sub provisionUEs($) {
 
     # Mark that we're done.
     system("$TOUCH $OAI_PROVISION_FF") == 0 or
-	die "Could not create OAI provisioning flag file!";
+	logdie("Could not create OAI provisioning flag file!");
 
 }
 
@@ -547,9 +586,9 @@ sub configureOAI() {
 	    $destdir .= "/freeDiameter";
 	}
 	open(SFILE, "<$OAI_ETCDIR/$cfile")
-	    or die "Could not open source OAI config file: $OAI_ETCDIR/$cfile\n";
+	    or logdie("Could not open source OAI config file: $OAI_ETCDIR/$cfile\n");
 	open(TFILE, ">$destdir/$cfile")
-	    or die "Could not open target OAI config file: $OAI_SYSETC/$cfile\n";
+	    or logdie("Could not open target OAI config file: $OAI_SYSETC/$cfile\n");
 	while (my $cline = <SFILE>) {
 	    chomp $cline;
 	    foreach my $pat (@REPLACE_PATS) {
@@ -563,7 +602,7 @@ sub configureOAI() {
 	}
 	close(SFILE);
 	close(TFILE);
-	print "Updated/installed OAI config file: $cfile\n";
+	logprint("Updated/installed OAI config file: $cfile\n");
     }
 
     # Role-specific tasks.
@@ -571,9 +610,9 @@ sub configureOAI() {
 	/^EPC$/ && do {
 	    # Generate freeDiameter certificates.
 	    system("$OAI_EPCDIR/scripts/check_mme_s6a_certificate $OAI_SYSETC/freeDiameter $fqdns{MME} > $OAI_LOGDIR/check_mme_cert.log 2>&1") == 0
-		or die "Failed to generate freeDiameter certs for MME!\n";
+		or logdie("Failed to generate freeDiameter certs for MME!\n");
 	    system("$OAI_EPCDIR/scripts/check_hss_s6a_certificate $OAI_SYSETC/freeDiameter $fqdns{HSS} > $OAI_LOGDIR/check_hss_cert.log 2>&1") == 0
-		or die "Failed to generate freeDiameter certs for HSS!\n";
+		or logdie("Failed to generate freeDiameter certs for HSS!\n");
 	    last ROLESW;
 	};
 	
@@ -590,13 +629,13 @@ sub configureOAI() {
     
     # Mark that we're done.
     system("$TOUCH $OAI_CONFIG_FF") == 0 or
-	die "Could not create OAI configuration flag file!";
+	logdie("Could not create OAI configuration flag file!");
 }
 
 sub startOAIService($) {
     my ($svcname) = @_;
 
-    print "Starting OAI service: $svcname\n";
+    logprint("Starting OAI service: $svcname\n");
 
     system("$OAI_BINDIR/${svcname}.start.sh") == 0
 	or warn "Could not start service: $svcname\n";
@@ -604,22 +643,22 @@ sub startOAIService($) {
     return $?;
 }
 
-# We are using the sync server in an unconventional fashion here. The epc node
-# simply starts a sync server and never tries to sync with it. Then when the
-# enb or simulated enb syncs, it only waits until a server comes up and then
-# continues. In this way, rebooting just the enodeb later on won't block forever.
-
 sub startSyncServer() {
-    print "Starting Sync Server\n";
+    logprint("Starting Sync Server\n");
     system("killall emulab-syncd");
     system("/usr/local/etc/emulab/emulab-syncd") == 0
 	or warn "Could not start sync server\n";
     return $?;
 }
 
-sub waitForSyncServer() {
-    print "Waiting for Sync Server\n";
-    system("/usr/local/etc/emulab/emulab-sync -n oai -s epc -i 1 -a") == 0
+sub waitForSyncServer($) {
+    my ($shouldIncrement) = @_;
+    my $increment = "";
+    if ($shouldIncrement) {
+	$increment = " -i 1";
+    }
+    logprint("Waiting for Sync Server\n");
+    system("/usr/local/etc/emulab/emulab-sync -n oai -s enb1-s1-lan $increment") == 0
 	or warn "Waiting for sync server failed\n";
     return $?;
 }
@@ -635,26 +674,27 @@ sub runOAI() {
 	    startOAIService("mme");
 	    sleep(5);
 	    startOAIService("spgw");
-	    sleep(5);
-	    startSyncServer();
+	    sleep(30);
+	    waitForSyncServer(1);
 	    last ROLESW;
 	};
 
 	/^ENB$/ && do {
-	    waitForSyncServer();
+	    startSyncServer();
+	    waitForSyncServer(0);
 	    startOAIService("enb");
 	    last ROLESW;
 	};
 
 	/^SIM_ENB$/ && do {
-	    waitForSyncServer();
+	    waitForSyncServer(0);
 	    startOAIService("sim_enb");
 	    last ROLESW;
 	};
 
 	# Default
-	die "Unknown role: $role\n";
+	logdie("Unknown role: $role\n");
     }
 
-    print "OAI services started.\n";
+    logprint("OAI services started.\n");
 }
