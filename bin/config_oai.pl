@@ -604,24 +604,23 @@ sub startOAIService($) {
     return $?;
 }
 
-sub remoteENB() {
-    print "Remotely starting eNodeB\n";
-    my $tries = 1;
-    my $done = 0;
-    while ($tries < 6 && ! $done)
-    {
-	system("sudo ssh -o StrictHostKeyChecking=no enb1 'sudo $OAI_BINDIR/enb.start.sh'");
-	if (($? >> 8) != 0)
-	{
-	    warn "Could not remotely start eNodeB, try $tries";
-	    $tries += 1;
-	    sleep(120);
-	}
-	else
-	{
-	    $done = 1;
-	}
-    }
+# We are using the sync server in an unconventional fashion here. The epc node
+# simply starts a sync server and never tries to sync with it. Then when the
+# enb or simulated enb syncs, it only waits until a server comes up and then
+# continues. In this way, rebooting just the enodeb later on won't block forever.
+
+sub startSyncServer() {
+    print "Starting Sync Server\n";
+    system("killall emulab-syncd");
+    system("/usr/local/etc/emulab/emulab-syncd") == 0
+	or warn "Could not start sync server\n";
+    return $?;
+}
+
+sub waitForSyncServer() {
+    print "Waiting for Sync Server\n";
+    system("/usr/local/etc/emulab/emulab-sync -n oai -s epc -i 1 -a") == 0
+	or warn "Waiting for sync server failed\n";
     return $?;
 }
 
@@ -637,16 +636,18 @@ sub runOAI() {
 	    sleep(5);
 	    startOAIService("spgw");
 	    sleep(5);
-	    remoteENB();
+	    startSyncServer();
 	    last ROLESW;
 	};
 
 	/^ENB$/ && do {
-	    #startOAIService("enb");
+	    waitForSyncServer();
+	    startOAIService("enb");
 	    last ROLESW;
 	};
 
 	/^SIM_ENB$/ && do {
+	    waitForSyncServer();
 	    startOAIService("sim_enb");
 	    last ROLESW;
 	};
