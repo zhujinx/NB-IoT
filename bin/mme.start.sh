@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OAIETCDIR="/local/repository/etc"
+
 cd /opt/oai/openair-cn/scripts
 
 # Kill off running function.
@@ -7,7 +9,7 @@ cd /opt/oai/openair-cn/scripts
 sleep 1
 
 # Startup function.
-screen -S mme -d -m -h 10000 /bin/bash -c "./run_mme"
+screen -c $OAIETCDIR/mme.screenrc -L -S mme -d -m -h 10000 /bin/bash -c "./run_mme"
 
 # Do some cleanup.
 screen -wipe >/dev/null 2>&1

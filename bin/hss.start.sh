@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OAIETCDIR="/local/repository/etc"
+
 cd /opt/oai/openair-cn/scripts
 
 # Kill off running function.
@@ -7,7 +9,7 @@ cd /opt/oai/openair-cn/scripts
 sleep 1
 
 # Startup function.
-screen -S hss -d -m -h 10000 /bin/bash -c "./run_hss"
+screen -c $OAIETCDIR/hss.sceenrc -L -S hss -d -m -h 10000 /bin/bash -c "./run_hss"
 
 # Do some cleanup.
 screen -wipe >/dev/null 2>&1

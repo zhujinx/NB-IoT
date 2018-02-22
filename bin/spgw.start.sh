@@ -1,5 +1,7 @@
 #!/bin/bash
 
+OAIETCDIR="/local/repository/etc"
+
 cd /opt/oai/openair-cn/scripts
 
 # Kill off running function.
@@ -7,7 +9,7 @@ cd /opt/oai/openair-cn/scripts
 sleep 1
 
 # Startup function.
-screen -S spgw -d -m -h 10000 /bin/bash -c "./run_spgw"
+screen -c $OAIETCDIR/spgw.screenrc -L -S spgw -d -m -h 10000 /bin/bash -c "./run_spgw"
 
 # Do some cleanup.
 screen -wipe >/dev/null 2>&1

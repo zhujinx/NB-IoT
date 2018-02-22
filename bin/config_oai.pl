@@ -150,7 +150,7 @@ sub help() {
 #
 # Setup logfile
 #
-open LOGFILE, ">>", "$OAI_LOGDIR/startup.log";
+open LOGFILE, ">", "$OAI_LOGDIR/startup.log";
 logprint("----------------------\n");
 logprint("Setting up OAI servers\n");
 logprint("----------------------\n");
