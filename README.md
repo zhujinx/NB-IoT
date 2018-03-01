@@ -21,6 +21,12 @@ processes on the `epc` and `enb1` nodes. Execute `sudo screen -ls` to
 see what sessions are available. The commands for controlling services
 on these nodes are located in `/local/repository/bin`.
 
+OAI is a project that is in development. As such, it is not always
+stable and there will be times when it gets into a failed state that
+it can never recover from. Almost always, you will be able to bring
+things back by either rebooting the experiment from the portal or
+restarting the services by hand from the command line.
+
 For more detailed information:
 
   * [Controlling OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/control.md)
