@@ -41,7 +41,7 @@ After these steps, rebuild whichever services you have modified as described bel
 The official repository for the eNodeB source code is
 [here](https://gitlab.eurecom.fr/oai/openairinterface5g) along with
 [build
-documentation](https://gitlab.eurecom.fr/oai/openairinterface5g). A
+documentation](https://gitlab.eurecom.fr/oai/openairinterface5g/wikis/AutoBuild#install-build-enb). A
 snapshot of that repository can be found on the `enb1` node in your
 experiment located at `/opt/oai/openairinterface5g`.
 
