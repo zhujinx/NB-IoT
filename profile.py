@@ -18,10 +18,10 @@ specific allocated resources.
 
 For more detailed information:
 
-  * [Getting Started](https://gitlab.flux.utah.edu/blob/master/README.md)
-  * [Controlling OAI](https://gitlab.flux.utah.edu/blob/master/control.md)
-  * [Inspecting OAI](https://gitlab.flux.utah.edu/blob/master/inspect.md)
-  * [Modifying OAI](https://gitlab.flux.utah.edu/blob/master/modify.md)
+  * [Getting Started](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/README.md)
+  * [Controlling OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/control.md)
+  * [Inspecting OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/inspect.md)
+  * [Modifying OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/modify.md)
 
 """
 
