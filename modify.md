@@ -26,13 +26,13 @@ correct order afterwards.
 
 Run this on the `enb1` node:
 
-   sudo /local/repository/bin/enb.kill.sh
+    sudo /local/repository/bin/enb.kill.sh
 
 Run this on the `epc` node:
 
-   sudo /local/repository/bin/mme.kill.sh
-   sudo /local/repository/bin/hss.kill.sh
-   sudo /local/repository/bin/spgw.kill.sh
+    sudo /local/repository/bin/mme.kill.sh
+    sudo /local/repository/bin/hss.kill.sh
+    sudo /local/repository/bin/spgw.kill.sh
 
 After these steps, rebuild whichever services you have modified as described below.
 
@@ -47,8 +47,8 @@ experiment located at `/opt/oai/openairinterface5g`.
 
 You can see exactly which commit this blockstore was forked from:
 
-   cd /opt/oai/openairinterface5g
-   git log
+    cd /opt/oai/openairinterface5g
+    git log
 
 Aside from a minor patch which slimmed down the build dependencies,
 this is a snapshot of the development branch of the repository.
@@ -56,8 +56,8 @@ this is a snapshot of the development branch of the repository.
 If you would like to rebuild the source after making some
 modification, first kill the enodeb service:
 
-   cd /opt/oai/openairinterface5g/cmake_targets
-   sudo ./build_oai --eNB -w USRP
+    cd /opt/oai/openairinterface5g/cmake_targets
+    sudo ./build_oai --eNB -w USRP
 
 ### Building the MME, HSS, or SPGW
 
@@ -70,17 +70,18 @@ experiment in the `/opt/oai/openair-cn` directory.
 
 To build the MME from source:
 
-   cd /opt/oai/openair-cn/SCRIPTS
-   sudo ./build_mme
+    cd /opt/oai/openair-cn/SCRIPTS
+    sudo ./build_mme
 
 To build the HSS from source:
 
-   cd /opt/oai/openair-cn/SCRIPTS
-   sudo ./build_hss
+    cd /opt/oai/openair-cn/SCRIPTS
+    sudo ./build_hss
 
 To build the SPGW from source:
-   cd /opt/oai/openair-cn/SCRIPTS
-   sudo ./build_spgw
+
+    cd /opt/oai/openair-cn/SCRIPTS
+    sudo ./build_spgw
 
 
 ### Restarting After Rebuilding
@@ -91,11 +92,11 @@ the start in the proper order.
 
 On the `epc` node:
 
-   sudo /local/repository/bin/config_oai.pl -r EPC
+    sudo /local/repository/bin/config_oai.pl -r EPC
 
 On the `enb` node:
 
-   sudo /local/repository/bin/config_oai.pl -r ENB
+    sudo /local/repository/bin/config_oai.pl -r ENB
 
 ### Saving Source Code Changes Permanently
 
@@ -103,9 +104,9 @@ In order to save changes permanently, you will need an external git
 repository. Then add it as a remote in `/opt/oai/openair-cn` or
 `/opt/oai/openairinterface5g` and push up your changes.
 
-   cd /opt/oai/openair-cn
-   git remote add myrepo url-or-ssh-path-to-my-repo
-   git push myrepo
+    cd /opt/oai/openair-cn
+    git remote add myrepo url-or-ssh-path-to-my-repo
+    git push myrepo
 
 Then on later experiments you can add your experiment as a remote,
 pull, and rebuild.

@@ -11,7 +11,7 @@ to interact and inspect the UE using adb from the `adb-tgt` node. Once
 you log into the `adb-tgt` node, you first need to make sure that the
 adb is connected to the UE through our proxy. 
 
-   pnadb -a
+    pnadb -a
 
 Sometimes just after rebooting this command will fail to connect. If
 so, try running it again after a few minutes. If it persists, you can
@@ -21,11 +21,11 @@ try connecting again once it is complete.
 Once connected through the proxy, almost any adb command will
 work. You can log into the UE with:
 
-   adb shell
+    adb shell
 
 You can inspect its device logs as well. Most usefully, you can see its radio log:
 
-   adb logcat -b radio
+    adb logcat -b radio
 
 ## Startup Scripts
 
@@ -43,7 +43,7 @@ in `/var/log/oai/enb.log`.
 
 To view the live output via screen, run:
 
-   sudo screen -r enb
+    sudo screen -r enb
 
 To detach from the screen without stopping the program, type `Ctrl-a d`.
 You can find out more about using screen with `man screen`.
@@ -54,22 +54,22 @@ error instead of handling it gracefully. If this happens, the screen
 will go away, but the log file persists so you can investigate the
 cause. And you can restart the service by hand with:
 
-   sudo /lcoal/repository/bin/enb.start.sh
+    sudo /lcoal/repository/bin/enb.start.sh
 
 ## Inspecting the EPC
 
 The EPC works in much the same way as the eNodeB. The MME, HSS, and
 SPGW services all run on the `epc` node. These services log to:
 
-   /var/log/oai/mme.log
-   /var/log/oai/hss.log
-   /var/log/oai/spgw.log
+    /var/log/oai/mme.log
+    /var/log/oai/hss.log
+    /var/log/oai/spgw.log
 
 And they all have screen sessions as well that can be found at:
 
-   sudo screen -r mme
-   sudo screen -r hss
-   sudo screen -r spgw
+    sudo screen -r mme
+    sudo screen -r hss
+    sudo screen -r spgw
 
 In particular, by default the MME logs a status message every few
 seconds which indicates if there is a connected eNodeB, attached UE,
@@ -102,7 +102,7 @@ at the configuration file for the enb service at
 running `ifconfig`, you can find the vlan interface on that same
 subnet. And now you can run something like:
 
-   sudo tcpdump -i vlan123
+    sudo tcpdump -i vlan123
 
 This will let you see the traffic as it flows or you can redirect the
 output to a file and run wireshark or other analysis software on it.
@@ -117,4 +117,4 @@ Look in `/usr/local/etc/oai/hss.conf` to see the database
 parameters. You can then log into the database to see or change the
 persistent state of the HSS:
 
-   mysql --user=root --password=linux oai_db
+    mysql --user=root --password=linux oai_db

@@ -21,5 +21,10 @@ processes on the `epc` and `enb1` nodes. Execute `sudo screen -ls` to
 see what sessions are available. The commands for controlling services
 on these nodes are located in `/local/repository/bin`.
 
-For more detailed information, see control.md, inspect.md, and modify.md.
+For more detailed information:
+
+  * [Controlling OAI](https://gitlab.flux.utah.edu/blob/master/control.md)
+  * [Inspecting OAI](https://gitlab.flux.utah.edu/blob/master/inspect.md)
+  * [Modifying OAI](https://gitlab.flux.utah.edu/blob/master/modify.md)
+
 

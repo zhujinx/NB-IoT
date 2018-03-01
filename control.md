@@ -12,7 +12,7 @@ the UE should attach and connect to provide end-to-end connectivity.
 Log into the `adb-tgt` node on your experiment. This node links to the
 UE via an adb proxy with this command:
 
-   pnadb -a
+    pnadb -a
 
 Sometimes just after rebooting this command will fail to connect. If
 so, try running it again after a few minutes. If it persists, you can
@@ -21,14 +21,14 @@ try connecting again once it is complete.
 
 You can log into the UE using adb:
 
-   adb shell
+    adb shell
 
 From there, you can manipulate or run any system on the phone. To see
 if there is end to end connectivity, try `ping 8.8.8.8` for example.
 
 The adb node can be rebooted from the command line with:
 
-   adb reboot
+    adb reboot
 
 Any other adb command can be run as well.
 
@@ -38,11 +38,11 @@ The startup script on the `enb1` node always waits for the EPC node
 and then starts the enb service when booting. You can start the enb
 service by hand by running:
 
-   sudo /local/repository/bin/enb.start.sh
+    sudo /local/repository/bin/enb.start.sh
 
 Or you can kill a running enb service with:
 
-   sudo /local/repository/bin/enb.kill.sh
+    sudo /local/repository/bin/enb.kill.sh
 
 The enb service should be started last because if it doesn't detect an
 mme when it starts, it will never connect.
@@ -54,17 +54,17 @@ services. After all three of these are started, it syncronises with
 the startup script on the `enb1`. To manually start any of these
 services, run one of these scripts on the `epc` node:
 
-   sudo /local/repository/bin/hss.start.sh
-   sudo /local/repository/bin/mme.start.sh
-   sudo /local/repository/bin/spgw.start.sh
+    sudo /local/repository/bin/hss.start.sh
+    sudo /local/repository/bin/mme.start.sh
+    sudo /local/repository/bin/spgw.start.sh
 
 When starting them all by hand, make sure to start them in that order.
 
 To kill these scripts, just run one of these on the `epc` node:
 
-   sudo /local/repository/bin/hss.kill.sh
-   sudo /local/repository/bin/mme.kill.sh
-   sudo /local/repository/bin/spgw.kill.sh
+    sudo /local/repository/bin/hss.kill.sh
+    sudo /local/repository/bin/mme.kill.sh
+    sudo /local/repository/bin/spgw.kill.sh
 
 ## Restarting without rebooting
 
@@ -72,11 +72,11 @@ If you want to restart all the services but don't want to reboot the
 nodes themselves, you can first kill all services, then on the `enb1`
 node, run:
 
-   sudo /local/repository/bin/config_oai.pl -r ENB
+    sudo /local/repository/bin/config_oai.pl -r ENB
 
 And on the `epc` node, run:
 
-   sudo /local/repository/bin/config_oai.pl -r EPC
+    sudo /local/repository/bin/config_oai.pl -r EPC
 
 ## Tweaking Configuration
 
