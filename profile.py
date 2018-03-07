@@ -104,6 +104,8 @@ pc.verifyParameters()
 request = pc.makeRequestRSpec()
 epclink = request.Link("s1-lan")
 
+# Checking for oaisim
+
 if params.TYPE == "sim":
     sim_enb = request.RawPC("sim-enb")
     #sim_enb.disk_image = GLOBALS.OAI_SIM_IMG
