@@ -81,9 +81,13 @@ pc.defineParameter("FIXED_ENB", "Bind to a specific eNodeB",
                    portal.ParameterType.STRING, "",
                    longDescription="Input the name of a PhantomNet eNodeB device to allocate (e.g., \'nuc1\').  Leave blank to let the mapping algorithm choose.  If you bind both UE and eNodeB devices, mapping will fail unless there is path between them via the attenuator matrix.")
 
-pc.defineParameter("RADIATEDRF", "Radiated (over-the-air) RF transmissions",
-                   portal.ParameterType.BOOLEAN, False,
+pc.defineParameter("TYPE", "Experiment type",
+                   portal.ParameterType.STRING,"atten",[("atten","RF devices with attenuator"),("ota","Over the air"),("sim","OAI SIM")],
                    longDescription="When enabled, RF devices with real antennas and transmissions propagated through free space will be selected.  Leave disabled (default) to assign RF devices connected via transmission lines with variable attenuator control.")
+
+#pc.defineParameter("RADIATEDRF", "Radiated (over-the-air) RF transmissions",
+#                   portal.ParameterType.BOOLEAN, False,
+#                   longDescription="When enabled, RF devices with real antennas and transmissions propagated through free space will be selected.  Leave disabled (default) to assign RF devices connected via transmission lines with variable attenuator control.")
 
 params = pc.bindParameters()
 
@@ -98,46 +102,56 @@ pc.verifyParameters()
 # to request in our experiment, and their configuration.
 #
 request = pc.makeRequestRSpec()
+epclink = request.Link("s1-lan")
 
-# Add a node to act as the ADB target host
-adb_t = request.RawPC("adb-tgt")
-adb_t.disk_image = GLOBALS.ADB_IMG
+if params.TYPE == "sim":
+    sim_enb = request.RawPC("sim-enb")
+    #sim_enb.disk_image = GLOBALS.OAI_SIM_IMG
+    sim_enb.disk_image = GLOBALS.OAI_ENB_IMG
+    #sim_enb.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r SIM_ENB"))
+    #connectOAI_SIM_DS(sim_enb)
+    connectOAI_DS(sim_enb)
+    epclink.addNode(sim_enb)
+else:
+    # Add a node to act as the ADB target host
+    adb_t = request.RawPC("adb-tgt")
+    adb_t.disk_image = GLOBALS.ADB_IMG
+
+    # Add a NUC eNB node.
+    enb1 = request.RawPC("enb1")
+    if params.FIXED_ENB:
+        enb1.component_id = params.FIXED_ENB
+    enb1.hardware_type = GLOBALS.NUC_HWTYPE
+    enb1.disk_image = GLOBALS.OAI_ENB_IMG
+    enb1.Desire( "rf-radiated" if params.TYPE == "ota" else "rf-controlled", 1 )
+    connectOAI_DS(enb1)
+    enb1.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r ENB"))
+    enb1_rue1_rf = enb1.addInterface("rue1_rf")
+
+    # Add an OTS (Nexus 5) UE
+    rue1 = request.UE("rue1")
+    if params.FIXED_UE:
+        rue1.component_id = params.FIXED_UE
+    rue1.hardware_type = GLOBALS.UE_HWTYPE
+    rue1.disk_image = GLOBALS.UE_IMG
+    rue1.Desire( "rf-radiated" if params.TYPE == "ota" else "rf-controlled", 1 )
+    rue1.adb_target = "adb-tgt"
+    rue1_enb1_rf = rue1.addInterface("enb1_rf")
+
+    # Create the RF link between the Nexus 5 UE and eNodeB
+    rflink2 = request.RFLink("rflink2")
+    rflink2.addInterface(enb1_rue1_rf)
+    rflink2.addInterface(rue1_enb1_rf)
+
+    # Add a link connecting the NUC eNB and the OAI EPC node.
+    epclink.addNode(enb1)
 
 # Add OAI EPC (HSS, MME, SPGW) node.
 epc = request.RawPC("epc")
 epc.disk_image = GLOBALS.OAI_EPC_IMG
 epc.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r EPC"))
 connectOAI_DS(epc)
-
-# Add a NUC eNB node.
-enb1 = request.RawPC("enb1")
-if params.FIXED_ENB:
-    enb1.component_id = params.FIXED_ENB
-enb1.hardware_type = GLOBALS.NUC_HWTYPE
-enb1.disk_image = GLOBALS.OAI_ENB_IMG
-enb1.Desire( "rf-radiated" if params.RADIATEDRF else "rf-controlled", 1 )
-connectOAI_DS(enb1)
-enb1.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r ENB"))
-enb1_rue1_rf = enb1.addInterface("rue1_rf")
-
-# Add an OTS (Nexus 5) UE
-rue1 = request.UE("rue1")
-if params.FIXED_UE:
-    rue1.component_id = params.FIXED_UE
-rue1.hardware_type = GLOBALS.UE_HWTYPE
-rue1.disk_image = GLOBALS.UE_IMG
-rue1.Desire( "rf-radiated" if params.RADIATEDRF else "rf-controlled", 1 )
-rue1.adb_target = "adb-tgt"
-rue1_enb1_rf = rue1.addInterface("enb1_rf")
-
-# Create the RF link between the Nexus 5 UE and eNodeB
-rflink2 = request.RFLink("rflink2")
-rflink2.addInterface(enb1_rue1_rf)
-rflink2.addInterface(rue1_enb1_rf)
-
-# Add a link connecting the NUC eNB and the OAI EPC node.
-epclink = request.Link("s1-lan")
-epclink.addNode(enb1)
+ 
 epclink.addNode(epc)
 epclink.link_multiplexing = True
 epclink.vlan_tagging = True
