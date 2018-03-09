@@ -44,18 +44,24 @@ import geni.rspec.emulab.pnext as PN
 #
 class GLOBALS(object):
     OAI_DS = "urn:publicid:IDN+emulab.net:phantomnet+ltdataset+oai-develop"
+    OAI_SIM_DS = "urn:publicid:IDN+emulab.net:phantomnet+dataset+PhantomNet:oai"
     UE_IMG  = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:ANDROID444-STD")
     ADB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU14-64-PNTOOLS")
     OAI_EPC_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU16-64-OAIEPC")
     OAI_ENB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU16-64-OAIENB")
-    OAI_CONF_SCRIPT = "/usr/bin/sudo /local/repository/bin/config_oai.pl"
+    OAI_SIM_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU14-64-OAI")
+    OAI_CONF_SCRIPT = "/usr/bin/sudo /opt/oai/phantomnet/bin/config_oai.pl"
+    SIM_HWTYPE = "d430"
     NUC_HWTYPE = "nuc5300"
     UE_HWTYPE = "nexus5"
 
-def connectOAI_DS(node):
+def connectOAI_DS(node, sim):
     # Create remote read-write clone dataset object bound to OAI dataset
     bs = request.RemoteBlockstore("ds-%s" % node.name, "/opt/oai")
-    bs.dataset = GLOBALS.OAI_DS
+    if sim == 1:
+	bs.dataset = GLOBALS.OAI_SIM_DS
+    else:
+	bs.dataset = GLOBALS.OAI_DS
     bs.rwclone = True
 
     # Create link from node to OAI dataset rw clone
@@ -108,11 +114,10 @@ epclink = request.Link("s1-lan")
 
 if params.TYPE == "sim":
     sim_enb = request.RawPC("sim-enb")
-    #sim_enb.disk_image = GLOBALS.OAI_SIM_IMG
-    sim_enb.disk_image = GLOBALS.OAI_ENB_IMG
-    #sim_enb.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r SIM_ENB"))
-    #connectOAI_SIM_DS(sim_enb)
-    connectOAI_DS(sim_enb)
+    sim_enb.disk_image = GLOBALS.OAI_SIM_IMG
+    sim_enb.hardware_type = GLOBALS.SIM_HWTYPE
+    sim_enb.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r SIM_ENB"))
+    connectOAI_DS(sim_enb, 1)
     epclink.addNode(sim_enb)
 else:
     # Add a node to act as the ADB target host
@@ -126,7 +131,7 @@ else:
     enb1.hardware_type = GLOBALS.NUC_HWTYPE
     enb1.disk_image = GLOBALS.OAI_ENB_IMG
     enb1.Desire( "rf-radiated" if params.TYPE == "ota" else "rf-controlled", 1 )
-    connectOAI_DS(enb1)
+    connectOAI_DS(enb1, 0)
     enb1.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r ENB"))
     enb1_rue1_rf = enb1.addInterface("rue1_rf")
 
@@ -152,7 +157,7 @@ else:
 epc = request.RawPC("epc")
 epc.disk_image = GLOBALS.OAI_EPC_IMG
 epc.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r EPC"))
-connectOAI_DS(epc)
+connectOAI_DS(epc, 0)
  
 epclink.addNode(epc)
 epclink.link_multiplexing = True
