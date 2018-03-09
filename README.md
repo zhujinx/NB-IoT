@@ -9,10 +9,21 @@ and epc nodes.  It is mounted as a clone of a remote blockstore
 here, but be aware that your changes will not persist when your
 experiment terminates.
 
-To access the UE via ADB, first log in to the `adb-tgt` node, then run
-`pnadb -a` to connect to the UE.  Use ADB commands as per normal
-afterward.  If/when you reboot the UE, be aware that you will need to
-again run `pnadb -a` to reestablish the ADB connection; wait a minute
+This experiment can work in two modes:
+1. UE and eNodeB SDR
+2. Simulated UE+eNodeB (OAISIM).
+
+To enable OAISIM, select OAI_SIM in the drop down menu "Experiment Type"
+while instantiating the experiment. When the experiment starts, two nodes
+will be created: sim_enb and epc.
+
+To get the SDR based eNodeB and off-the-shelf UE, select one of the other
+two options in the "Experiment Type" based upon the requirements.
+
+When using real UE, to access the UE via ADB, first log in to the `adb-tgt`
+node, then run `pnadb -a` to connect to the UE.  Use ADB commands as per
+normal afterward.  If/when you reboot the UE, be aware that you will need
+to again run `pnadb -a` to reestablish the ADB connection; wait a minute
 or so for the UE to become available again before doing this.
 
 The OAI mobile networking functions should automatically start up when

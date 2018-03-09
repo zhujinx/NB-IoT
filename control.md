@@ -47,6 +47,39 @@ Or you can kill a running enb service with:
 The enb service should be started last because if it doesn't detect an
 mme when it starts, it will never connect.
 
+## Simulated UE+eNB control
+
+When the experiment starts, necessary scripts are started with the required
+configurations. You can monitor the logs by attaching to the screen:
+  
+    sudo screen -r sim_enb
+
+To confirm if UE is connected, ping using the oip1 interface:
+
+    ping -I oip1 8.8.8.8
+
+To restart oaisim, use:
+
+    sudo /local/repository/bin/config_oai.pl -r SIM_ENB
+
+The code for oaisim can be found in `/opt/oai/openairinterface5g`.
+You can build the latest version of the code by using following steps:
+
+    cd ~
+    git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git
+    cd openairinterface5g
+    source oaienv
+    cd cmake_targets
+    ./build_oai -I  --oaisim -x --install-system-files
+    ./build_oai --oaisim -c
+    cd tools
+    sudo ./run_enb_ue_virt_s1 -c <conf_file>
+
+You can use the config file `/usr/local/etc/oai/enb.conf` and update any
+necessary parameters like interfaces, MCC, MNC etc.
+Please note that current profile has been tested with the default binaries
+and not with other versions of OAI.
+
 ## EPC Control
 
 The startup script on the `epc` boots up the hss, mme, and spgw
