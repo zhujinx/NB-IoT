@@ -7,6 +7,13 @@ fresh disk image wiping out any changes) from the portal
 interface. After any reboot, all services will automatically start and
 the UE should attach and connect to provide end-to-end connectivity.
 
+## Restarting without rebooting
+
+If you want to restart all the services but don't want to reboot the
+nodes themselves, you can run this script on either the `enb1` or `epc` nodes:
+
+    sudo /local/repository/bin/start_oai.pl
+
 ## UE Control
 
 Log into the `adb-tgt` node on your experiment. This node links to the
@@ -82,10 +89,8 @@ and not with other versions of OAI.
 
 ## EPC Control
 
-The startup script on the `epc` boots up the hss, mme, and spgw
-services. After all three of these are started, it syncronises with
-the startup script on the `enb1`. To manually start any of these
-services, run one of these scripts on the `epc` node:
+To manually start any of the EPC services, run one of these scripts on
+the `epc` node:
 
     sudo /local/repository/bin/hss.start.sh
     sudo /local/repository/bin/mme.start.sh
@@ -98,18 +103,6 @@ To kill these scripts, just run one of these on the `epc` node:
     sudo /local/repository/bin/hss.kill.sh
     sudo /local/repository/bin/mme.kill.sh
     sudo /local/repository/bin/spgw.kill.sh
-
-## Restarting without rebooting
-
-If you want to restart all the services but don't want to reboot the
-nodes themselves, you can first kill all services, then on the `enb1`
-node, run:
-
-    sudo /local/repository/bin/config_oai.pl -r ENB
-
-And on the `epc` node, run:
-
-    sudo /local/repository/bin/config_oai.pl -r EPC
 
 ## Tweaking Configuration
 

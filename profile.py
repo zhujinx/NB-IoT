@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 
-"""
-NOTE: This profile tracks more recent versions of OAI (develop branch),
-      and is likely to change more frequently.
+#
+# Standard geni-lib/portal libraries
+#
+import geni.portal as portal
+import geni.rspec.pg as rspec
+import geni.rspec.emulab as elab
+import geni.rspec.igext as IG
+import geni.urn as URN
 
+
+tourDescription = """
 Use this profile to instantiate an experiment using Open Air Interface
 to realize an end-to-end SDR-based mobile network. This profile includes
 the following resources:
@@ -18,21 +25,22 @@ specific allocated resources.
 
 For more detailed information:
 
-  * [Getting Started](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/README.md)
-  * [Controlling OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/control.md)
-  * [Inspecting OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/inspect.md)
-  * [Modifying OAI](https://gitlab.flux.utah.edu/duerig/oai-enb/blob/master/modify.md)
+  * [Getting Started](https://gitlab.flux.utah.edu/powder-profiles/OAI-Real-Hardware/blob/master/README.md)
 
-"""
+""";
 
-#
-# Standard geni-lib/portal libraries
-#
-import geni.portal as portal
-import geni.rspec.pg as rspec
-import geni.rspec.emulab as elab
-import geni.rspec.igext
-import geni.urn as URN
+tourInstructions = """
+After booting is complete, log onto either the `enb1` or `epc` nodes. From there, you will be able to start all OAI services across the network by running:
+
+    sudo /local/repository/bin/start_oai.pl
+
+This will stop any currently running OAI services, start all services (both epc and enodeb) again, and then interactively show a tail of the logs of the mme and enodeb services. Once you see the logs, you can exit at any time with Ctrl-C, but the services stay running in the background and save logs to `/var/log/oai/*` on the `enb1` and `epc` nodes.
+
+Once all the services are running, the UE device will typically connect on its own, but if it doesn't you can reboot the phone. You can manage the UE by logging into the `adb-tgt` node, running `pnadb -a` to connect, and then managing it via any `adb` command such as `adb shell` or `adb reboot`.
+
+While OAI is still a system in development and may be unstable, you can usually recover from any issue by running `start_oai.pl` to restart all the services.
+""";
+
 
 #
 # PhantomNet extensions.
@@ -81,15 +89,15 @@ pc = portal.Context()
 # Profile parameters.
 #
 pc.defineParameter("FIXED_UE", "Bind to a specific UE",
-                   portal.ParameterType.STRING, "",
-                   longDescription="Input the name of a PhantomNet UE node to allocate (e.g., \'ue1\').  Leave blank to let the mapping algorithm choose.")
+                   portal.ParameterType.STRING, "", advanced=True,
+                   longDescription="Input the name of a PhantomNet UE node to allocate (e.g., 'ue1').  Leave blank to let the mapping algorithm choose.")
 pc.defineParameter("FIXED_ENB", "Bind to a specific eNodeB",
-                   portal.ParameterType.STRING, "",
-                   longDescription="Input the name of a PhantomNet eNodeB device to allocate (e.g., \'nuc1\').  Leave blank to let the mapping algorithm choose.  If you bind both UE and eNodeB devices, mapping will fail unless there is path between them via the attenuator matrix.")
+                   portal.ParameterType.STRING, "", advanced=True,
+                   longDescription="Input the name of a PhantomNet eNodeB device to allocate (e.g., 'nuc1').  Leave blank to let the mapping algorithm choose.  If you bind both UE and eNodeB devices, mapping will fail unless there is path between them via the attenuator matrix.")
 
 pc.defineParameter("TYPE", "Experiment type",
-                   portal.ParameterType.STRING,"atten",[("atten","RF devices with attenuator"),("ota","Over the air"),("sim","OAI SIM")],
-                   longDescription="When enabled, RF devices with real antennas and transmissions propagated through free space will be selected.  Leave disabled (default) to assign RF devices connected via transmission lines with variable attenuator control.")
+                   portal.ParameterType.STRING,"atten",[("sim","Simulated UE"),("atten","Real UE with attenuator"),("ota","Over the air")],
+                   longDescription="*Simulated UE*: OAI simulated UE connects to an OAI eNodeB and EPC. *Real UE with attenuator*: Real RF devices will be connected via transmission lines with variable attenuator control. *Over the air*: Real RF devices with real antennas and transmissions propagated through free space will be selected.")
 
 #pc.defineParameter("RADIATEDRF", "Radiated (over-the-air) RF transmissions",
 #                   portal.ParameterType.BOOLEAN, False,
@@ -163,6 +171,11 @@ epclink.addNode(epc)
 epclink.link_multiplexing = True
 epclink.vlan_tagging = True
 epclink.best_effort = True
+
+tour = IG.Tour()
+tour.Description(IG.Tour.MARKDOWN, tourDescription)
+tour.Instructions(IG.Tour.MARKDOWN, tourInstructions)
+rspec.addTour(tour)
 
 #
 # Print and go!

@@ -201,7 +201,7 @@ TOPSW: for ($role) {
     # Default
     logdie("Unknown role: $role\n");
 }
-runOAI();
+#runOAI();
 
 #
 # Helper to lookup a list of hosts, searching for an IP.
