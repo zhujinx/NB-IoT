@@ -175,7 +175,7 @@ epclink.best_effort = True
 tour = IG.Tour()
 tour.Description(IG.Tour.MARKDOWN, tourDescription)
 tour.Instructions(IG.Tour.MARKDOWN, tourInstructions)
-rspec.addTour(tour)
+request.addTour(tour)
 
 #
 # Print and go!
