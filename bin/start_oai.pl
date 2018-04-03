@@ -57,10 +57,10 @@ if ($nickname =~ /^enb/)
 # Begin Services
 #
 print "Killing off any old services...\n";
-system($epcStart . "/local/repository/bin/hss.start.sh");
-system($epcStart . "/local/repository/bin/mme.start.sh");
-system($epcStart . "/local/repository/bin/spgw.start.sh");
-system($enbStart . "/local/repository/bin/enb.start.sh");
+system($epcStart . "/local/repository/bin/hss.kill.sh");
+system($epcStart . "/local/repository/bin/mme.kill.sh");
+system($epcStart . "/local/repository/bin/spgw.kill.sh");
+system($enbStart . "/local/repository/bin/enb.kill.sh");
 
 print "Starting HSS...\n";
 system($epcStart . "/local/repository/bin/hss.start.sh");
@@ -75,14 +75,22 @@ system($epcStart . "/local/repository/bin/spgw.start.sh");
 sleep(30);
 
 print "Starting ENB...\n";
-system($enbStart . "/local/repository/bin/enb.start.sh");
+my $devices = `${enbStart}lsusb`;
+if ($devices =~ /2500:0020/)
+{
+    system($enbStart . "/local/repository/bin/enb.start.sh");
+}
+else
+{
+    print "ERROR: Could not detect USRP B210 radio on the enb1 node. This is usually a transient error. Reboot the enb1 node and try again.\n";
+    exit(1);
+}
 
 #
 # Display Output of services
 #
 system("multitail ".
-#       "-l \"$epcStart tail -f /var/log/oai/hss.log\" ".
+       #       "-l \"$epcStart tail -f /var/log/oai/hss.log\" ".
        "-l \"$epcStart tail -f /var/log/oai/mme.log\" ".
-#       "-l \"$epcStart tail -f /var/log/oai/spgw.log\" ".
+       #       "-l \"$epcStart tail -f /var/log/oai/spgw.log\" ".
        "-l \"$enbStart tail -f /var/log/oai/enb.log\"");
-
