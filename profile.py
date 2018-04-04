@@ -30,13 +30,22 @@ For more detailed information:
 """;
 
 tourInstructions = """
-After booting is complete, log onto either the `enb1` or `epc` nodes. From there, you will be able to start all OAI services across the network by running:
+After booting is complete,
+For Simulated UE, log onto `epc` node and run:
+
+    sudo /local/repository/bin/start_oai.pl -r sim
+
+Else, log onto either the `enb1` or `epc` nodes. From there, you will be able to start all OAI services across the network by running:
 
     sudo /local/repository/bin/start_oai.pl
 
-This will stop any currently running OAI services, start all services (both epc and enodeb) again, and then interactively show a tail of the logs of the mme and enodeb services. Once you see the logs, you can exit at any time with Ctrl-C, but the services stay running in the background and save logs to `/var/log/oai/*` on the `enb1` and `epc` nodes.
+Above command will stop any currently running OAI services, start all services (both epc and enodeb) again, and then interactively show a tail of the logs of the mme and enodeb services. Once you see the logs, you can exit at any time with Ctrl-C, but the services stay running in the background and save logs to `/var/log/oai/*` on the `enb1` and `epc` nodes.
 
 Once all the services are running, the UE device will typically connect on its own, but if it doesn't you can reboot the phone. You can manage the UE by logging into the `adb-tgt` node, running `pnadb -a` to connect, and then managing it via any `adb` command such as `adb shell` or `adb reboot`.
+
+For Simulated UE experiment, check the connectivity by logging into the `sim-enb` node and run:
+
+    ping -I oip1 8.8.8.8
 
 While OAI is still a system in development and may be unstable, you can usually recover from any issue by running `start_oai.pl` to restart all the services.
 
