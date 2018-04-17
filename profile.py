@@ -11,6 +11,9 @@ import geni.urn as URN
 
 
 tourDescription = """
+
+# EXPERIMENTAL PROFILE TO TEST SDR UE
+
 Use this profile to instantiate an experiment using Open Air Interface
 to realize an end-to-end SDR-based mobile network. This profile includes
 the following resources:
@@ -141,8 +144,8 @@ if params.TYPE == "sim":
     epclink.addNode(sim_enb)
 else:
     # Add a node to act as the ADB target host
-    adb_t = request.RawPC("adb-tgt")
-    adb_t.disk_image = GLOBALS.ADB_IMG
+    #adb_t = request.RawPC("adb-tgt")
+    #adb_t.disk_image = GLOBALS.ADB_IMG
 
     # Add a NUC eNB node.
     enb1 = request.RawPC("enb1")
@@ -156,13 +159,14 @@ else:
     enb1_rue1_rf = enb1.addInterface("rue1_rf")
 
     # Add an OTS (Nexus 5) UE
-    rue1 = request.UE("rue1")
+    rue1 = request.RawPC("rue1")
     if params.FIXED_UE:
         rue1.component_id = params.FIXED_UE
-    rue1.hardware_type = GLOBALS.UE_HWTYPE
-    rue1.disk_image = GLOBALS.UE_IMG
+    rue1.hardware_type = GLOBALS.NUC_HWTYPE
+    rue1.disk_image = GLOBALS.OAI_ENB_IMG
     rue1.Desire( "rf-radiated" if params.TYPE == "ota" else "rf-controlled", 1 )
-    rue1.adb_target = "adb-tgt"
+    connectOAI_DS(rue1, 0)
+    enb1.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r UE"))
     rue1_enb1_rf = rue1.addInterface("enb1_rf")
 
     # Create the RF link between the Nexus 5 UE and eNodeB
