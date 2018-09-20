@@ -66,7 +66,7 @@ import geni.rspec.emulab.pnext as PN
 # Globals
 #
 class GLOBALS(object):
-    OAI_DS = "urn:publicid:IDN+emulab.net:phantomnet+ltdataset+oai-develop"
+    OAI_DS = "urn:publicid:IDN+emulab.net:powdersandbox+ltdataset+OAI"
     OAI_SIM_DS = "urn:publicid:IDN+emulab.net:phantomnet+dataset+PhantomNet:oai"
     UE_IMG  = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:ANDROID444-STD")
     ADB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU14-64-PNTOOLS")
