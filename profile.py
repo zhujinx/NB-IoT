@@ -85,7 +85,7 @@ def connectOAI_DS(node, type):
     bs = request.RemoteBlockstore("ds-%s" % node.name, "/opt/oai")
     if type == 1:
 	bs.dataset = GLOBALS.OAI_UE_DS
-    else if type ==2:
+    elseif type ==2:
 	bs.dataset = GLOBALS.OAI_EPC_DS
     else
         bs.dataset = GLOBALS.OAI_DS
