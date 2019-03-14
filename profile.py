@@ -82,7 +82,7 @@ class GLOBALS(object):
 def connectOAI_DS(node, type):
     # Create remote read-write clone dataset object bound to OAI dataset
     bs = request.RemoteBlockstore("ds-%s" % node.name, "/opt/oai")
-    if sim == 1:
+    if type == 1:
 	bs.dataset = GLOBALS.OAI_UE_DS
     else:
 	bs.dataset = GLOBALS.OAI_DS
@@ -166,7 +166,7 @@ else:
     rue1.hardware_type = GLOBALS.NUC_HWTYPE
     rue1.disk_image = GLOBALS.OAI_ENB_IMG
     rue1.Desire( "rf-radiated" if params.TYPE == "ota" else "rf-controlled", 1 )
-    connectOAI_DS(rue1, 0)
+    connectOAI_DS(rue1, 1)
     enb1.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r UE"))
     rue1_enb1_rf = rue1.addInterface("enb1_rf")
 
