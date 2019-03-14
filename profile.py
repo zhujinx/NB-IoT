@@ -87,7 +87,7 @@ def connectOAI_DS(node, type):
 	bs.dataset = GLOBALS.OAI_UE_DS
     elif type ==2:
 	bs.dataset = GLOBALS.OAI_EPC_DS
-    else
+    else:
         bs.dataset = GLOBALS.OAI_DS
     #bs.rwclone = True
 
