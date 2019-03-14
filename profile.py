@@ -86,7 +86,7 @@ def connectOAI_DS(node, type):
 	bs.dataset = GLOBALS.OAI_UE_DS
     else:
 	bs.dataset = GLOBALS.OAI_DS
-    #bs.rwclone = True
+    bs.rwclone = True
 
     # Create link from node to OAI dataset rw clone
     node_if = node.addInterface("dsif_%s" % node.name)
