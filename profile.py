@@ -67,6 +67,7 @@ import geni.rspec.emulab.pnext as PN
 #
 class GLOBALS(object):
     OAI_DS = "urn:publicid:IDN+emulab.net:powdersandbox+ltdataset+NB-IoT"
+    OAI_UE_DS = "urn:publicid:IDN+emulab.net:powdersandbox+ltdataset+NB-IoT-UE"
     OAI_SIM_DS = "urn:publicid:IDN+emulab.net:phantomnet+dataset+PhantomNet:oai"
     UE_IMG  = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:ANDROID444-STD")
     ADB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU14-64-PNTOOLS")
@@ -78,11 +79,11 @@ class GLOBALS(object):
     NUC_HWTYPE = "nuc5300"
     UE_HWTYPE = "nexus5"
 
-def connectOAI_DS(node, sim):
+def connectOAI_DS(node, type):
     # Create remote read-write clone dataset object bound to OAI dataset
     bs = request.RemoteBlockstore("ds-%s" % node.name, "/opt/oai")
     if sim == 1:
-	bs.dataset = GLOBALS.OAI_SIM_DS
+	bs.dataset = GLOBALS.OAI_UE_DS
     else:
 	bs.dataset = GLOBALS.OAI_DS
     #bs.rwclone = True
