@@ -68,6 +68,7 @@ import geni.rspec.emulab.pnext as PN
 class GLOBALS(object):
     OAI_DS = "urn:publicid:IDN+emulab.net:powdersandbox+ltdataset+NB-IoT"
     OAI_UE_DS = "urn:publicid:IDN+emulab.net:powdersandbox+ltdataset+NB-IoT-UE"
+    OAI_EPC_DS="urn:publicid:IDN+emulab.net:powdersandbox+ltdataset+OAI'
     OAI_SIM_DS = "urn:publicid:IDN+emulab.net:phantomnet+dataset+PhantomNet:oai"
     UE_IMG  = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:ANDROID444-STD")
     ADB_IMG = URN.Image(PN.PNDEFS.PNET_AM, "PhantomNet:UBUNTU14-64-PNTOOLS")
@@ -84,9 +85,11 @@ def connectOAI_DS(node, type):
     bs = request.RemoteBlockstore("ds-%s" % node.name, "/opt/oai")
     if type == 1:
 	bs.dataset = GLOBALS.OAI_UE_DS
-    else:
-	bs.dataset = GLOBALS.OAI_DS
-    bs.rwclone = True
+    else if type ==2:
+	bs.dataset = GLOBALS.OAI_EPC_DS
+    else
+        bs.dataset = GLOBALS.OAI_DS
+    #bs.rwclone = True
 
     # Create link from node to OAI dataset rw clone
     node_if = node.addInterface("dsif_%s" % node.name)
@@ -182,7 +185,7 @@ else:
 epc = request.RawPC("epc")
 epc.disk_image = GLOBALS.OAI_EPC_IMG
 epc.addService(rspec.Execute(shell="sh", command=GLOBALS.OAI_CONF_SCRIPT + " -r EPC"))
-connectOAI_DS(epc, 0)
+connectOAI_DS(epc, 2)
  
 epclink.addNode(epc)
 epclink.link_multiplexing = True
